@@ -1,27 +1,101 @@
-.grid{
-    width: 400px;
-    height: 600px;
-    background-color: yellow;
+body {
+    align-items: center;
+    overflow: hidden;
+    /* background-image:url("../images/body_background.jpg"); */
+    background-repeat: no-repeat;
+    background-size: cover;
     position: relative;
-}
-
-.doodler{
-    width: 60px;
-    height: 85px;
-    background-color: red;
+    max-width: 100%;
+    
+    margin: 0 150px;
+    }
+    
+    .main-body{
+    max-width: 100%;
+    margin: 0 150px;
+    }
+    
+    canvas {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 45px;
     position: absolute;
-}
-
-.enemy{
-    width: 30px;
-    height: 45px;
-    background-color: blue;
-    position: relative;
-}
-
-.platform{
-    width: 85px;
-    height: 15px;
-    background-color: green;
-    position: absolute;
-}
+    left: calc(50% - 200px);
+    width: 800px;
+    border: 5px solid ;
+    border-color: black;
+    }
+    
+    .title{
+    text-align: center;
+    color:brown;
+    }
+    
+    footer{
+      background:rgb(231,105,42);
+    }
+    
+    .button{
+      position: absolute;
+      top: 500px;
+      left: calc(50% - 45px);
+      margin:auto;
+      height: 50px;
+      width: 90px;
+      background-color: rgb(245,238,232);
+      color:rgb(160,40,34);
+      border-radius: 54%;
+      border-color: rgb(160,40,34);
+      font-size: 25px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    
+    .instructions{
+      position: absolute;
+      top:75px;
+      text-align: center;
+      width:250px;
+      /* background:rgb(214,212,93); */
+      border:2px solid black;
+      color: black;
+      border-radius: 5%;
+      padding:20px;
+    }
+    
+    .links{
+      position: absolute;
+      left: 80%;
+      top:200px;
+    }
+    
+    .links a{
+      font-family: fantasy;
+      font-size: 50px;
+      font-weight: bold;
+      display: block;
+      list-style: none;
+      color:rgb(214,212,93);
+    }
+    
+    .image-doodle{
+      position: absolute;
+      top:200px;
+      left: 70%;
+    }
+    
+    .copyright{
+      display: flex;
+      justify-content: center;
+    }
+    .copyright a {
+      margin: 10px;
+      font-size: 20px;
+    }
+    .colsiz{
+      color: black;
+      font-size: 35px;
+    }
+    

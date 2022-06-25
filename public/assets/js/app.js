@@ -1,76 +1,187 @@
-import Platform from "./platform.js"
-
-var canvas = document.querySelector("#MyCanvas");
-var context = canvas.getContext("2d");
-
-var canvasPos = getPosition(canvas);
-var mouseX = 0;
-var mouseY = 0;
-
-
-// mouse listener
-canvas.addEventListener("mousemove", setMousePosition, false);
-
-function setMousePosition(e) {
-    mouseX = e.clientX - canvasPos.x;
-    mouseY = e.clientY - canvasPos.y;
+var GRAVITY = - 0.6;
+var player;
+var platforms = [];
+var points;
+var bg;
+var buttonPressed = false;
+var gameOver = false;
+var img;
+var img2;
+var score = 0;
+var song;
+function setup(){
+  createCanvas(400,600);
+  img = loadImage("assets/images/logo.png");
+  img2 = loadImage("assets/images/doodleenemy.png");
+  bg = loadImage("assets/images/background.png");
+  button = createButton("Play");
+  button.mousePressed(play);
+  button.addClass("button");
 }
 
-// draw a diagonal line
-context.moveTo(50, 50);
-context.lineTo(450, 300);
- 
-// close the path
-context.closePath();
- 
-// specify what our line looks like
-context.lineWidth = 45;
-context.strokeStyle = "steelblue";
- 
-// get the line drawn to the canvas
-context.stroke();
+function entryInfo(){
+  if(gameOver){
+  image(img,50,100,300,100);
+  textAlign(CENTER);
+  textSize(50);
+  noStroke();
+  fill("rgb(104,153,34)");
+  text("Game Over!", width / 2, height / 2);
+  textAlign(CENTER);
+  textSize(30);
+  noStroke();
+  fill("rgb(169,40,34)");
+  text(`Score : ${score}`,width / 2 , height / 2 +35)
+  button = createButton("Play");
+  button.mousePressed(play);
+  button.addClass("button");
+}else{
+  image(img2,155,-15,90,50);
+}
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-    const grid = document.querySelector('.grid')
-    const doodler = document.createElement('div')
-    //enemy creation -- NEW
-    const enemy = document.createElement('div')
-    let doodlerLeftSpace = 50
-    let doodlerBottomSpace = 150
-    let enemyLeftSpace = 60
-    let enemyBottomSpace = 160
-    let isGameOver = false
-    let platformCount = 5
+function play(){
+  createCanvas(400,600);
+  bg = loadImage("assets/images/background.png");
+  player = new Doodler(width/2,height/2,false);
+  platforms = generatePlatforms();
+  points = 0;
+  frameRate(30);
+  buttonPressed=true;
+}
 
-    function createDoodler(){
-        grid.appendChild(doodler)
-        doodler.classList.add('doodler')
-        doodler.style.left = doodlerLeftSpace + 'px'
-        doodler.style.bottom = doodlerBottomSpace + 'px'
+
+function draw(){
+  if (buttonPressed){
+    background(bg);
+    /*
+    */
+    if(score > 100){
+      //if the score is [insert num here], fewer platforms should be generated
+      handlePlatforms();
     }
+    handlePlatforms();
+    handlePlayer();
+    //drawScore();
+    handleKeys();
+  }else{
+  background(bg);
+  //entryInfo();
+  }
+}
 
-    function createEnemy(){
-        grid.appendChild(enemy)
-        enemy.classList.add('enemy')
-        enemy.style.left = enemyLeftSpace + 'px'
-        enemy.style.bottom = enemyBottomSpace + 'px'
-    }
 
-    function createPlatforms(){
-        for(let i=0; i<platformCount; i++){
-            let platGap = 600 / platformCount
-            let newPlatBottom = 100 + i * platGap
-            let newPlatform = new Platform(newPlatBottom)
+/*
+ * updates, draws, and applies GRAVITY to player
+ * checks if the player falls
+ */
+function handlePlayer() {
+	player.update();
+  player.draw();
+  if (player.maxA + player.loc.y < -height / 2) {
+    endGame();
+  }
+}
+
+/**
+ * checks collision, draws, and manages all platforms
+ */
+function handlePlatforms() {
+
+  for (var i = platforms.length - 1; i >= 0; i--) {
+		// loop through platforms backward
+    if (platforms[i].onScreen) {
+      platforms[i].draw(player.loc.y);
+			if (platforms[i] instanceof Doodler)
+				platforms[i].update(); // update Doodlers
+      if (platforms[i].collidesWith(player)) {
+        player.jump();
+        if (platforms[i] instanceof Doodler) {
+					// it's not a platform, but a doodler!
+          points += 100;
+          platforms.splice(i, 1); // remove from array
         }
-    }
+      }
+    } else {
 
-    function start(){
-        if(isGameOver == false){
-            createDoodler()
-            createPlatforms()
-            createEnemy()
-        }
+      /* no longer on-screen, delete previous platforms */
+      platforms.splice(i, 1);
+			/* push new platform */
+      var x = noise(player.maxA, frameCount) * width;
+      var y = player.maxA + height;
+      if (random() < 0.9) {
+				// 90% chance of being a regular platform
+        platforms.push(new Platform(x, y));
+      } else {
+        if (random() > 0.5) {
+					// 5% chance of being a doodler
+					platforms.push(new Doodler(x, y, true));
+				}
+				// 5% chance of not regenerating
+      }
     }
-    //attach to button
-    start()
-})
+  }
+}
+
+/**
+ * initializes platforms
+ */
+function generatePlatforms() {
+
+	var field = []; // returning array
+  var x_arr = [];
+  var y_arr =  [];
+	for (var y = 0; y < height * 3; y += 40) {
+		// loop through Y
+    for (var i = 0; i < 3; i++) { // attempt 3 new platforms
+      var x = noise(i, y) * width;
+      while (x_arr.includes(x)){
+        x = noise(i, y) * width;
+      }
+
+      if (noise(y, i) > 0.5){ // 50% chance of a new platform
+        field.push(new Platform(x, y));
+      }
+        x_arr <<  x ;
+
+    }
+  }
+
+	return field;
+}
+/**
+ * moves player based upon user input
+ */
+function handleKeys() {
+
+  if (keyIsDown(LEFT_ARROW)) {
+
+    player.applyForce(-1, 0);
+  } else if (keyIsDown(RIGHT_ARROW)) {
+
+    player.applyForce(1, 0);
+  }
+}
+
+/**
+ * draws the score
+ */
+function drawScore() {
+
+  textSize(20);
+  textAlign(LEFT);
+  fill("#000000");
+  noStroke();
+  score = (player.maxA + points - 300).toFixed(0)
+  text(`Score : ${(player.maxA + points - 300).toFixed(0)}`,10,25);
+
+}
+
+/**
+ * ends loop, draws game over message
+ */
+function endGame() {
+  gameOver = true ;
+  buttonPressed = false;
+  // song.play();
+}
