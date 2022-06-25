@@ -1,11 +1,11 @@
 function Doodler(x,a,enemy){
     this.loc = createVector(x,a);
     this.vel = createVector(0,0);
-    this.img = loadImage("assets/images/doodle.png");
+    this.img = loadImage("public/assets/images/doodle.png");
     this.enemy = enemy;
     this.maxA = a;//max altitude
     this.premaxAltitude = a;
-    this.eImage = loadImage("assets/images/doodleenemy.png");
+    this.eImage = loadImage("public/assets/images/doodleenemy.png");
     this.force = 12;
     this.drone = 0;
     this.s = 50;

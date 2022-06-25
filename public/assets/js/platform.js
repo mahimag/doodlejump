@@ -1,7 +1,7 @@
 function Platform(x,altitude){
     this.x = x;
     this.altitude = altitude;//altitude
-    this.img = loadImage("assets/images/grass.png");
+    this.img = loadImage("public/assets/images/grass.png");
     this.onScreen = true;
     this.s = 50;
   }

@@ -11,9 +11,9 @@ var score = 0;
 var song;
 function setup(){
   createCanvas(400,600);
-  img = loadImage("assets/images/logo.png");
-  img2 = loadImage("assets/images/doodleenemy.png");
-  bg = loadImage("assets/images/background.png");
+  img = loadImage("public/assets/images/logo.png");
+  img2 = loadImage("public/assets/images/doodleenemy.png");
+  bg = loadImage("public/assets/images/background.png");
   button = createButton("Play");
   button.mousePressed(play);
   button.addClass("button");
@@ -42,7 +42,7 @@ function entryInfo(){
 
 function play(){
   createCanvas(400,600);
-  bg = loadImage("assets/images/background.png");
+  bg = loadImage("public/assets/images/background.png");
   player = new Doodler(width/2,height/2,false);
   platforms = generatePlatforms();
   points = 0;
