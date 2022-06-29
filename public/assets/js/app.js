@@ -151,34 +151,33 @@ var y_arr = []
 var flag = true;
 function generatePlatforms() {
   platforms = [];
-  while(flag){
-    stepSize = Math.floor(canvas.height / 10);
-    //for(let i = height; i>= 0; i-= stepSize){
-    for(let i=25; i>=0; i--){ // 8
-      let p = new Platform(getRandomValue(0,canvas.width-60), i*50);
-      p.onScreen = true;
-      y_arr.push(p.altitude);
-      platforms.push(p);
-      //sort by y length , if the y length between any of them is greater than the jumping distance, generate new platforms...
-      console.log(platforms[i]);
-    }
-    sort(y_arr); // 1 2 3 4 5 6 7 8 9 .. 25
-    let dist = 0;
-    for(var j=0; j<y_arr.length; j++){
-      if(dist < y_arr[j+1] - y_arr[j]){
-        dist = y_arr[j+1] - y_arr[j];
-      }
-      if(j == (y_arr.length - 1)){
-        break;
-      }
-    }
-    if(dist < 50){ //might change this num
-      flag = false;
-    }
+  stepSize = Math.floor(canvas.height / 10);
+  //for(let i = height; i>= 0; i-= stepSize){
+  for(let i=25; i>=0; i--){ // 8
+    let p = new Platform(getRandomValue(0,canvas.width-60), i*50);
+    p.onScreen = true;
+    y_arr.push(p.altitude);
+    platforms.push(p);
+    //sort by y length , if the y length between any of them is greater than the jumping distance, generate new platforms...
   }
+  // sort(y_arr); // 1 2 3 4 5 6 7 8 9 .. 25
+  // let dist = 0;
+  // for(var j=0; j<y_arr.length; j++){
+  //   if(dist < y_arr[j+1] - y_arr[j]){
+  //     dist = y_arr[j+1] - y_arr[j];
+  //   }
+  //   if(j == (y_arr.length - 1)){
+  //     break;
+  //   }
+  // }
+  // if(dist < 50){ //might change this num
+  //   flag = false;
+  // }
+  // flag = false;
+  // }
   return platforms;
 
-  //
+  /*
   stepSize = Math.floor(canvas.height / 10); //where 10 is num of steps per screen
   for (let y = height; y > 0; y -= stepSize) {
     const x = Platform.w / 2 + (width - Platform.w) * Math.random();
@@ -189,7 +188,7 @@ function generatePlatforms() {
     const springed = Math.random() < config.SPRINGED_CHANCE;
     platforms.push(new Platform(x, y, type, springed));
   }
-  //
+  */
 
 	// var platforms = []; // returning array
   // var x_arr = [];
@@ -252,10 +251,10 @@ function endGame() {
     localStorage.setItem('doodleHigh', highScore);
   }
   // clearing data
-  // localStorage.clear();
+  localStorage.clear();
 
-  console.log(score);
-  console.log(highScore);
+  // console.log(score);
+  // console.log(highScore);
 
   // song.play();
 }
