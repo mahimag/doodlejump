@@ -5,13 +5,23 @@ var points;
 var bg;
 var buttonPressed = false;
 var gameOver = false;
-var img;
+//var img;
 var img2;
 var score = 0;
 var song;
+
+//trying to change mouse here
+// addEventListener('mousemove', function(event) {
+//     console.log(event);
+//     //creates object with x and y coordinates
+//     mouse.x = event.x;
+//     mouse.y = event.y;
+// })
+
+
 function setup(){
   createCanvas(400,600);
-  img = loadImage("public/assets/images/logo.png");
+  //img = loadImage("images/logo.png");
   img2 = loadImage("public/assets/images/doodleenemy.png");
   bg = loadImage("public/assets/images/background.png");
   button = createButton("Play");
@@ -21,7 +31,7 @@ function setup(){
 
 function entryInfo(){
   if(gameOver){
-  image(img,50,100,300,100);
+  //image(img,50,100,300,100);
   textAlign(CENTER);
   textSize(50);
   noStroke();
@@ -62,11 +72,11 @@ function draw(){
     }
     handlePlatforms();
     handlePlayer();
-    //drawScore();
+    drawScore();
     handleKeys();
   }else{
   background(bg);
-  //entryInfo();
+  entryInfo();
   }
 }
 
@@ -95,6 +105,8 @@ function handlePlatforms() {
 			if (platforms[i] instanceof Doodler)
 				platforms[i].update(); // update Doodlers
       if (platforms[i].collidesWith(player)) {
+        /* if player collides with a power booster attached to platform
+        */
         player.jump();
         if (platforms[i] instanceof Doodler) {
 					// it's not a platform, but a doodler!
@@ -128,7 +140,7 @@ function handlePlatforms() {
  */
 function generatePlatforms() {
 
-	var field = []; // returning array
+	var platforms = []; // returning array
   var x_arr = [];
   var y_arr =  [];
 	for (var y = 0; y < height * 3; y += 40) {
@@ -140,14 +152,14 @@ function generatePlatforms() {
       }
 
       if (noise(y, i) > 0.5){ // 50% chance of a new platform
-        field.push(new Platform(x, y));
+        platforms.push(new Platform(x, y));
       }
         x_arr <<  x ;
 
     }
   }
 
-	return field;
+	return platforms;
 }
 /**
  * moves player based upon user input
