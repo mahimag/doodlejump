@@ -9,6 +9,7 @@ var gameOver = false;
 var img2;
 var score = 0;
 var song;
+var highScore = 0;
 
 //trying to change mouse here
 // addEventListener('mousemove', function(event) {
@@ -18,20 +19,29 @@ var song;
 //     mouse.y = event.y;
 // })
 
+/*
+utils
+*/
+getRandomValue = function(max,min){
+  let val = Math.random() * (max - min) + min;
+  return Math.round(val);
+}
 
 function setup(){
   createCanvas(400,600);
-  //img = loadImage("images/logo.png");
+  // img = loadImage("public/assets/images/backdrop2.jpg");
   img2 = loadImage("public/assets/images/doodleenemy.png");
-  bg = loadImage("public/assets/images/background.png");
+  // bg = loadImage("public/assets/images/background.png");
+  bg = loadImage("public/assets/images/backdrop2.jpg");
   button = createButton("Play");
   button.mousePressed(play);
   button.addClass("button");
+  highScore = localStorage.getItem('doodleHigh') || 0;
 }
 
 function entryInfo(){
   if(gameOver){
-  //image(img,50,100,300,100);
+  // image(img,50,100,300,100);
   textAlign(CENTER);
   textSize(50);
   noStroke();
@@ -46,7 +56,7 @@ function entryInfo(){
   button.mousePressed(play);
   button.addClass("button");
 }else{
-  image(img2,155,-15,90,50);
+  //image(img2,155,-15,90,50);
 }
 }
 
@@ -66,10 +76,6 @@ function draw(){
     background(bg);
     /*
     */
-    if(score > 100){
-      //if the score is [insert num here], fewer platforms should be generated
-      handlePlatforms();
-    }
     handlePlatforms();
     handlePlayer();
     drawScore();
@@ -133,33 +139,78 @@ function handlePlatforms() {
       }
     }
   }
+  
 }
 
 /**
  * initializes platforms
  */
+var platforms = [];
+var stepSize = 0;
+var y_arr = []
+var flag = true;
 function generatePlatforms() {
-
-	var platforms = []; // returning array
-  var x_arr = [];
-  var y_arr =  [];
-	for (var y = 0; y < height * 3; y += 40) {
-		// loop through Y
-    for (var i = 0; i < 3; i++) { // attempt 3 new platforms
-      var x = noise(i, y) * width;
-      while (x_arr.includes(x)){
-        x = noise(i, y) * width;
+  platforms = [];
+  while(flag){
+    stepSize = Math.floor(canvas.height / 10);
+    //for(let i = height; i>= 0; i-= stepSize){
+    for(let i=25; i>=0; i--){ // 8
+      let p = new Platform(getRandomValue(0,canvas.width-60), i*50);
+      p.onScreen = true;
+      y_arr.push(p.altitude);
+      platforms.push(p);
+      //sort by y length , if the y length between any of them is greater than the jumping distance, generate new platforms...
+      console.log(platforms[i]);
+    }
+    sort(y_arr); // 1 2 3 4 5 6 7 8 9 .. 25
+    let dist = 0;
+    for(var j=0; j<y_arr.length; j++){
+      if(dist < y_arr[j+1] - y_arr[j]){
+        dist = y_arr[j+1] - y_arr[j];
       }
-
-      if (noise(y, i) > 0.5){ // 50% chance of a new platform
-        platforms.push(new Platform(x, y));
+      if(j == (y_arr.length - 1)){
+        break;
       }
-        x_arr <<  x ;
-
+    }
+    if(dist < 50){ //might change this num
+      flag = false;
     }
   }
+  return platforms;
 
-	return platforms;
+  //
+  stepSize = Math.floor(canvas.height / 10); //where 10 is num of steps per screen
+  for (let y = height; y > 0; y -= stepSize) {
+    const x = Platform.w / 2 + (width - Platform.w) * Math.random();
+    let type = Platform.platformTypes.getRandomType();
+    while (type === Platform.platformTypes.FRAGILE) {
+      type = Platform.platformTypes.getRandomType();
+    }
+    const springed = Math.random() < config.SPRINGED_CHANCE;
+    platforms.push(new Platform(x, y, type, springed));
+  }
+  //
+
+	// var platforms = []; // returning array
+  // var x_arr = [];
+  // var y_arr =  [];
+	// for (var y = 0; y < height * 3; y += 40) {
+	// 	// loop through Y
+  //   for (var i = 0; i < 3; i++) { // attempt 3 new platforms
+  //     var x = noise(i, y) * width;
+  //     while (x_arr.includes(x)){
+  //       x = noise(i, y) * width;
+  //     }
+
+  //     if (noise(y, i) > 0.5){ // 50% chance of a new platform
+  //       platforms.push(new Platform(x, y));
+  //     }
+  //       x_arr <<  x ;
+
+  //   }
+  // }
+
+	//return platforms;
 }
 /**
  * moves player based upon user input
@@ -186,7 +237,7 @@ function drawScore() {
   noStroke();
   score = (player.maxA + points - 300).toFixed(0)
   text(`Score : ${(player.maxA + points - 300).toFixed(0)}`,10,25);
-
+  text(`High Score : ${(highScore)}`,10,45);
 }
 
 /**
@@ -195,5 +246,16 @@ function drawScore() {
 function endGame() {
   gameOver = true ;
   buttonPressed = false;
+
+  if(parseInt(score)> highScore) {
+    highScore = parseInt(score);
+    localStorage.setItem('doodleHigh', highScore);
+  }
+  // clearing data
+  // localStorage.clear();
+
+  console.log(score);
+  console.log(highScore);
+
   // song.play();
 }

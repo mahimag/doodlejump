@@ -8,6 +8,14 @@ function Platform(x,altitude){
   this.s = 50;
 }
 
+Platform.prototype.update = function(){
+  this.x += this.dx;
+  if(this.x> canvas.width-this.s || this.x<= 0){
+      this.dx*= -1;
+  }
+  this.draw();
+}
+
 Platform.prototype.draw =  function(altitude){
   if(altitude - this.altitude < height/2){
     image(this.img,this.x,(altitude-this.altitude + height/2),this.s,15);
