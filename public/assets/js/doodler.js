@@ -17,20 +17,18 @@ Doodler.prototype.update = function(){
     this.drone += map(this.maxA, 0, 15000, 0.0001, 0.1);
     this.loc.x = (Math.sin(this.drone) * (width / 2)) + width / 2;
   }else{
-   this.loc.add(this.vel);
-   this.vel.x *= 0.8;
-   player.applyForce(createVector(0,GRAVITY));
-   this.maxA = (this.loc.y > this.maxA ) ? this.loc.y :this.maxA;
+    this.loc.add(this.vel);
+    this.vel.x *= 0.8;
+    player.applyForce(createVector(0,GRAVITY));
+    this.maxA = (this.loc.y > this.maxA ) ? this.loc.y :this.maxA;
   }
 };
 
-
-Doodler.prototype.applyForce= function(force){
+Doodler.prototype.applyForce = function(force){
  this.vel.add(force);
 };
 
 Doodler.prototype.draw = function(altitude){
-
   if (this.enemy) {
 		// draw relative to platforms
     if (altitude - this.loc.y < height) {
@@ -45,14 +43,14 @@ Doodler.prototype.draw = function(altitude){
   }
 };
 
-Doodler.prototype.jump = function(){
+Doodler.prototype.jump = function(force){
   this.vel.y *= 0;
   //this.newSong.play();
   if (this.premaxAltitude === this.maxA) {
 		// stronger hop as the altitude remains constant
     this.force = constrain(this.force + 1, 12, 8);
   } else {
-    this.force = 15;
+    this.force = force;
   }
   this.applyForce(createVector(0, this.force));
   this.premaxAltitude = this.maxA;

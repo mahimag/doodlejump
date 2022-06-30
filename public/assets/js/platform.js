@@ -1,24 +1,49 @@
-function Platform(x,altitude){
+function Platform(x,altitude, img, moving, hasSpring){
   this.x = x;
   this.altitude = altitude;//altitude
-  this.dx = 1; // 0 when still
+  this.dx = 4; // 0 when still
   this.dy = 1;
-  this.img = loadImage("public/assets/images/grass.png");
+  this.img = img;
+  this.spring = loadImage("public/assets/images/spring.png");
   this.onScreen = true;
   this.s = 50;
+  this.drone = 0;
+  this.loc = createVector(x,altitude);
+  this.moving = moving;
+  this.hasSpring = hasSpring;
 }
 
-Platform.prototype.update = function(){
-  this.x += this.dx;
-  if(this.x> canvas.width-this.s || this.x<= 0){
-      this.dx*= -1;
+//updates the platform by moving it vertically
+Platform.prototype.update = function(random_boolean){
+  //this code
+  // this.drone += map(this.altitude, 0, 15000, 0.0001, 0.1);
+  // this.loc.x = (Math.sin(this.drone) * (width / 2)) + width / 2;
+
+  // this.draw(this.altitude);
+  
+  // worked
+  if(random_boolean){
+    if(this.x > canvas.width-this.s || this.x <= 0){
+        this.dx*= -1;
+    }
+    this.x += this.dx;
   }
-  this.draw();
+  //
+  // if(this.x + this.radius > canvas.width || this.x < 0){
+  //         this.dx = -this.dx;
+  // }
+  // this.x += this.dx;
+
+  //this.drawMoving(this.loc.x, this.altitude);
 }
 
-Platform.prototype.draw =  function(altitude){
+Platform.prototype.draw = function(altitude){
+  
   if(altitude - this.altitude < height/2){
     image(this.img,this.x,(altitude-this.altitude + height/2),this.s,15);
+    if(this.moving){
+      this.drawMoving();
+    }
   /*
   //
   stroke("#FF0000");
@@ -30,6 +55,35 @@ Platform.prototype.draw =  function(altitude){
     this.onScreen = false;
   }
 };
+
+//draws moving platform
+Platform.prototype.drawMoving = function(altitude){
+  // if it is on-screen
+  if(altitude - this.altitude < height/2){
+
+  image(this.img, this.loc.x, (this.altitude - this.loc.altitude + height/2),this.s, 15); //might want to change this.altitude to altitude
+
+  // if(x - this.x < height/2){
+  //   image(this.img,(x-this.x + height/2),this.altitude,this.s,15);
+  }else{
+    this.onScreen = false;
+  }
+};
+
+//draws platform w spring
+//need to draw relative to platform
+Platform.prototype.drawSpring = function(altitude){
+  // draw relative to platforms
+  if (altitude - this.loc.y < height) {
+    //image(this.img, this.loc.x, (altitude - this.loc.altitude + height/2),this.s, 15); //might want to change this.altitude to altitude
+    //drawing the spring on top of platform
+    image(this.spring, this.loc.x + 100, (altitude - this.loc.altitude + height/2) - 100, this.s, 15); //might want to change this.altitude to altitude
+  }else{
+    this.onScreen = false;
+  }
+  
+};
+
 
 Platform.prototype.collidesWith = function(doodler){
   var pT = this.altitude; //platform altitude
@@ -55,16 +109,15 @@ Platform.prototype.collidesWith = function(doodler){
   return false;
 };
 
-//updates the platform by moving it horizontally
-Platform.prototype.updateMoveH = function(){
-  if(this.x + this.radius > canvas.width || this.x < 0){
-      this.dx = -this.dx;
-  }
-  this.x += this.dx;
-  this.draw();
-}
+// //updates the platform by moving it horizontally
+// Platform.prototype.updateMoveH = function(){
+//   if(this.x + this.radius > canvas.width || this.x < 0){
+//       this.dx = -this.dx;
+//   }
+//   this.x += this.dx;
+//   this.draw();
+// }
 
-//updates the platform by moving it vertically
 Platform.prototype.updateMoveV = function(){
   if(this.altitude + this.radius > canvas.height || this.altitude < 0){
       this.dy = -this.dy;

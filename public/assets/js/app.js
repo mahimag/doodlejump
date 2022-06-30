@@ -5,11 +5,14 @@ var points;
 var bg;
 var buttonPressed = false;
 var gameOver = false;
-//var img;
 var img2;
 var score = 0;
 var song;
 var highScore = 0;
+//images
+var gPlatform;
+var bPlatform;
+
 
 //trying to change mouse here
 // addEventListener('mousemove', function(event) {
@@ -33,6 +36,8 @@ function setup(){
   img2 = loadImage("public/assets/images/doodleenemy.png");
   // bg = loadImage("public/assets/images/background.png");
   bg = loadImage("public/assets/images/backdrop2.jpg");
+  gPlatform = loadImage("public/assets/images/grass.png");
+  bPlatform = loadImage("public/assets/images/tile-blue.png");
   button = createButton("Play");
   button.mousePressed(play);
   button.addClass("button");
@@ -41,23 +46,24 @@ function setup(){
 
 function entryInfo(){
   if(gameOver){
-  // image(img,50,100,300,100);
-  textAlign(CENTER);
-  textSize(50);
-  noStroke();
-  fill("rgb(104,153,34)");
-  text("Game Over!", width / 2, height / 2);
-  textAlign(CENTER);
-  textSize(30);
-  noStroke();
-  fill("rgb(169,40,34)");
-  text(`Score : ${score}`,width / 2 , height / 2 +35)
-  button = createButton("Play");
-  button.mousePressed(play);
-  button.addClass("button");
-}else{
-  //image(img2,155,-15,90,50);
-}
+    // image(img,50,100,300,100);
+    textAlign(CENTER);
+    textSize(50);
+    noStroke();
+    fill("rgb(104,153,34)");
+    text("Game Over!", width / 2, height / 2);
+    textAlign(CENTER);
+    textSize(30);
+    noStroke();
+    fill("rgb(169,40,34)");
+    text(`Score : ${score}`,width / 2 , height / 2 +35)
+    button = createButton("Play");
+    button.mousePressed(play);
+    button.addClass("button");
+  }
+  else {
+    //image(img2,155,-15,90,50);
+  }
 }
 
 function play(){
@@ -74,8 +80,6 @@ function play(){
 function draw(){
   if (buttonPressed){
     background(bg);
-    /*
-    */
     handlePlatforms();
     handlePlayer();
     drawScore();
@@ -102,18 +106,42 @@ function handlePlayer() {
 /**
  * checks collision, draws, and manages all platforms
  */
-function handlePlatforms() {
+//  let p = new Platform(getRandomValue(0,canvas.width-60), i*50);
+var r = getRandomValue((0,1), 100);
+var random_boolean = false; 
 
+function handlePlatforms() {
   for (var i = platforms.length - 1; i >= 0; i--) {
 		// loop through platforms backward
+    //random_boolean = random() < 0.5; //might wanna change the 0.5
+    console.log(platforms[i]);
     if (platforms[i].onScreen) {
+      //if platform moves call correct update func
+      if(platforms[i].moving && !platforms[i].hasSpring && platforms[i] instanceof Platform){
+
+        platforms[i].update(true);
+        platforms[i].drawMoving(platforms[i].altitude);
+        
+      }
+      console.log('has Spring? ' + platforms[i].hasSpring);
+      if(platforms[i].hasSpring){
+        platforms[i].img = gPlatform;
+        platforms[i].drawSpring(platforms[i].altitude);
+        if(platforms[i].collidesWith(player)){
+          player.jump(25);
+        }
+      }
+      //draws regular platform
+      // console.log('does not');
       platforms[i].draw(player.loc.y);
+      
+      
 			if (platforms[i] instanceof Doodler)
 				platforms[i].update(); // update Doodlers
       if (platforms[i].collidesWith(player)) {
         /* if player collides with a power booster attached to platform
         */
-        player.jump();
+        player.jump(15);
         if (platforms[i] instanceof Doodler) {
 					// it's not a platform, but a doodler!
           points += 100;
@@ -121,15 +149,15 @@ function handlePlatforms() {
         }
       }
     } else {
-
       /* no longer on-screen, delete previous platforms */
       platforms.splice(i, 1);
 			/* push new platform */
       var x = noise(player.maxA, frameCount) * width;
       var y = player.maxA + height;
-      if (random() < 0.9) {
+      if (random() < 0.95) {
 				// 90% chance of being a regular platform
-        platforms.push(new Platform(x, y));
+        random_boolean = Math.random() < 0.9;
+        platforms.push(new Platform(x, y, gPlatform, Math.random() > 0.9, Math.random() > 0.9));
       } else {
         if (random() > 0.5) {
 					// 5% chance of being a doodler
@@ -149,32 +177,21 @@ var platforms = [];
 var stepSize = 0;
 var y_arr = []
 var flag = true;
+var random_boolean = 0;
+
 function generatePlatforms() {
   platforms = [];
   stepSize = Math.floor(canvas.height / 10);
   //for(let i = height; i>= 0; i-= stepSize){
   for(let i=25; i>=0; i--){ // 8
-    let p = new Platform(getRandomValue(0,canvas.width-60), i*50);
+    // random_boolean = Math.random() < 0.5;
+    //console.log(random_boolean);
+    let p = new Platform(getRandomValue(0,canvas.width-60), i*50, gPlatform, Math.random() > 0.9, Math.random() < 0.9);
     p.onScreen = true;
-    y_arr.push(p.altitude);
+    //y_arr.push(p.altitude);
     platforms.push(p);
     //sort by y length , if the y length between any of them is greater than the jumping distance, generate new platforms...
   }
-  // sort(y_arr); // 1 2 3 4 5 6 7 8 9 .. 25
-  // let dist = 0;
-  // for(var j=0; j<y_arr.length; j++){
-  //   if(dist < y_arr[j+1] - y_arr[j]){
-  //     dist = y_arr[j+1] - y_arr[j];
-  //   }
-  //   if(j == (y_arr.length - 1)){
-  //     break;
-  //   }
-  // }
-  // if(dist < 50){ //might change this num
-  //   flag = false;
-  // }
-  // flag = false;
-  // }
   return platforms;
 
   /*
