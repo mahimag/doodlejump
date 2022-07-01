@@ -26,12 +26,15 @@ Platform.prototype.update = function(random_boolean){
 
 Platform.prototype.draw = function(altitude){
   if(altitude - this.altitude < height/2){
-    image(this.img,this.x,(altitude-this.altitude + height/2),this.s,15);
     if(this.moving && !this.hasSpring){
       image(this.img2, this.x, (altitude - this.altitude + height/2), this.s, 15);
     }
-    if(this.hasSpring && !this.moving){
+    else if(this.hasSpring && !this.moving){
       image(this.spring, this.x, (altitude - this.altitude + height/2) - 8, this.s, 15);
+      image(this.img,this.x,(altitude-this.altitude + height/2),this.s,15);
+    }
+    else{
+      image(this.img,this.x,(altitude-this.altitude + height/2),this.s,15);
     }
   }else{
     this.onScreen = false;

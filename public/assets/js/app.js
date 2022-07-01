@@ -13,20 +13,18 @@ var highScore = 0;
 var difficulty = 0.90;
 var numPlatforms = 30;
 
-/*
-utils
-*/
+
+//utils
 getRandomValue = function(max,min){
   let val = Math.random() * (max - min) + min;
   return Math.round(val);
 }
 
+//
 function setup(){
   createCanvas(400,600);
   img = loadImage("public/assets/images/doodleenemy.png");
   bg = loadImage("public/assets/images/backdrop2.jpg");
-  gPlatform = loadImage("public/assets/images/grass.png");
-  bPlatform = loadImage("public/assets/images/tile-blue.png");
   button = createButton("Play");
   button.mousePressed(play);
   button.addClass("button");
@@ -81,6 +79,8 @@ function handlePlayer() {
 var random_boolean = false; 
 
 function handlePlatforms() {
+
+  //starter platform
   for (var i = platforms.length - 1; i >= 0; i--) {
 		// loop through platforms backward
     if (platforms[i].onScreen) {
@@ -144,19 +144,16 @@ var stepSize = 0;
 var y_arr = []
 var flag = true;
 var random_boolean = 0;
+var p;
 
 function generatePlatforms() {
   platforms = [];
   stepSize = Math.floor(canvas.height / 10);
-  //for(let i = height; i>= 0; i-= stepSize){
-  for(let i=numPlatforms; i>=0; i--){ // 8
-    // random_boolean = Math.random() < 0.5;
-    //console.log(random_boolean);
-    let p = new Platform(getRandomValue(0,canvas.width-60), i*50, Math.random() > difficulty, Math.random() > difficulty + .09);
+  for(let i=numPlatforms; i>=1; i--){ // 8
+    //starter platform
+    p = new Platform(getRandomValue(0,canvas.width-60), i*50, Math.random() > difficulty, Math.random() > difficulty + .09);
     p.onScreen = true;
-    //y_arr.push(p.altitude);
     platforms.push(p);
-    //sort by y length , if the y length between any of them is greater than the jumping distance, generate new platforms...
   }
   return platforms;
 }
@@ -204,9 +201,8 @@ function endGame() {
   }
   // clearing data
   localStorage.clear();
-  
+
   if(gameOver){
-    // image(img,50,100,300,100);
     textAlign(CENTER);
     textSize(50);
     noStroke();
