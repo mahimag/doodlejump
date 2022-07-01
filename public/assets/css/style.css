@@ -53,18 +53,6 @@ body {
       cursor: pointer;
     }
     
-    .instructions{
-      position: absolute;
-      top:75px;
-      text-align: center;
-      width:250px;
-      /* background:rgb(214,212,93); */
-      border:2px solid black;
-      color: black;
-      border-radius: 5%;
-      padding:20px;
-    }
-    
     .links{
       position: absolute;
       left: 80%;

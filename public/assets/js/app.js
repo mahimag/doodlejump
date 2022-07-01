@@ -5,22 +5,13 @@ var points;
 var bg;
 var buttonPressed = false;
 var gameOver = false;
-var img2;
+var img;
 var score = 0;
 var song;
 var highScore = 0;
 //images
-var gPlatform;
-var bPlatform;
-
-
-//trying to change mouse here
-// addEventListener('mousemove', function(event) {
-//     console.log(event);
-//     //creates object with x and y coordinates
-//     mouse.x = event.x;
-//     mouse.y = event.y;
-// })
+var difficulty = 0.90;
+var numPlatforms = 30;
 
 /*
 utils
@@ -32,9 +23,7 @@ getRandomValue = function(max,min){
 
 function setup(){
   createCanvas(400,600);
-  // img = loadImage("public/assets/images/backdrop2.jpg");
-  img2 = loadImage("public/assets/images/doodleenemy.png");
-  // bg = loadImage("public/assets/images/background.png");
+  img = loadImage("public/assets/images/doodleenemy.png");
   bg = loadImage("public/assets/images/backdrop2.jpg");
   gPlatform = loadImage("public/assets/images/grass.png");
   bPlatform = loadImage("public/assets/images/tile-blue.png");
@@ -42,28 +31,6 @@ function setup(){
   button.mousePressed(play);
   button.addClass("button");
   highScore = localStorage.getItem('doodleHigh') || 0;
-}
-
-function entryInfo(){
-  if(gameOver){
-    // image(img,50,100,300,100);
-    textAlign(CENTER);
-    textSize(50);
-    noStroke();
-    fill("rgb(104,153,34)");
-    text("Game Over!", width / 2, height / 2);
-    textAlign(CENTER);
-    textSize(30);
-    noStroke();
-    fill("rgb(169,40,34)");
-    text(`Score : ${score}`,width / 2 , height / 2 +35)
-    button = createButton("Play");
-    button.mousePressed(play);
-    button.addClass("button");
-  }
-  else {
-    //image(img2,155,-15,90,50);
-  }
 }
 
 function play(){
@@ -85,8 +52,10 @@ function draw(){
     drawScore();
     handleKeys();
   }else{
-  background(bg);
-  entryInfo();
+    background(bg);
+    if(gameOver){
+      endGame();
+    }
   }
 }
 
@@ -98,7 +67,10 @@ function draw(){
 function handlePlayer() {
 	player.update();
   player.draw();
-  if (player.maxA + player.loc.y < -height / 2) {
+  // if (player.maxA + player.loc.y < -height / 2) {
+  //   endGame();
+  // }
+  if(player.loc.y < 0){
     endGame();
   }
 }
@@ -106,27 +78,20 @@ function handlePlayer() {
 /**
  * checks collision, draws, and manages all platforms
  */
-//  let p = new Platform(getRandomValue(0,canvas.width-60), i*50);
-var r = getRandomValue((0,1), 100);
 var random_boolean = false; 
 
 function handlePlatforms() {
   for (var i = platforms.length - 1; i >= 0; i--) {
 		// loop through platforms backward
-    //random_boolean = random() < 0.5; //might wanna change the 0.5
-    console.log(platforms[i]);
     if (platforms[i].onScreen) {
       //if platform moves call correct update func
       if(platforms[i].moving && !platforms[i].hasSpring && platforms[i] instanceof Platform){
-
         platforms[i].update(true);
         platforms[i].drawMoving(platforms[i].altitude);
-        
       }
-      console.log('has Spring? ' + platforms[i].hasSpring);
       if(platforms[i].hasSpring){
-        platforms[i].img = gPlatform;
-        platforms[i].drawSpring(platforms[i].altitude);
+        //platforms[i].img = gPlatform;
+        platforms[i].draw(player.loc.y);
         if(platforms[i].collidesWith(player)){
           player.jump(25);
         }
@@ -155,13 +120,14 @@ function handlePlatforms() {
       var x = noise(player.maxA, frameCount) * width;
       var y = player.maxA + height;
       if (random() < 0.95) {
-				// 90% chance of being a regular platform
-        random_boolean = Math.random() < 0.9;
-        platforms.push(new Platform(x, y, gPlatform, Math.random() > 0.9, Math.random() > 0.9));
+				// 90% chance of platform
+        platforms.push(new Platform(x, y, Math.random() > difficulty , Math.random() > difficulty));
+        difficulty -= 0.0001;
       } else {
-        if (random() > 0.5) {
+        if (random() < (difficulty - 0.4)) {
 					// 5% chance of being a doodler
 					platforms.push(new Doodler(x, y, true));
+          difficulty -= 0.0001;
 				}
 				// 5% chance of not regenerating
       }
@@ -183,61 +149,30 @@ function generatePlatforms() {
   platforms = [];
   stepSize = Math.floor(canvas.height / 10);
   //for(let i = height; i>= 0; i-= stepSize){
-  for(let i=25; i>=0; i--){ // 8
+  for(let i=numPlatforms; i>=0; i--){ // 8
     // random_boolean = Math.random() < 0.5;
     //console.log(random_boolean);
-    let p = new Platform(getRandomValue(0,canvas.width-60), i*50, gPlatform, Math.random() > 0.9, Math.random() < 0.9);
+    let p = new Platform(getRandomValue(0,canvas.width-60), i*50, Math.random() > difficulty, Math.random() > difficulty + .09);
     p.onScreen = true;
     //y_arr.push(p.altitude);
     platforms.push(p);
     //sort by y length , if the y length between any of them is greater than the jumping distance, generate new platforms...
   }
   return platforms;
-
-  /*
-  stepSize = Math.floor(canvas.height / 10); //where 10 is num of steps per screen
-  for (let y = height; y > 0; y -= stepSize) {
-    const x = Platform.w / 2 + (width - Platform.w) * Math.random();
-    let type = Platform.platformTypes.getRandomType();
-    while (type === Platform.platformTypes.FRAGILE) {
-      type = Platform.platformTypes.getRandomType();
-    }
-    const springed = Math.random() < config.SPRINGED_CHANCE;
-    platforms.push(new Platform(x, y, type, springed));
-  }
-  */
-
-	// var platforms = []; // returning array
-  // var x_arr = [];
-  // var y_arr =  [];
-	// for (var y = 0; y < height * 3; y += 40) {
-	// 	// loop through Y
-  //   for (var i = 0; i < 3; i++) { // attempt 3 new platforms
-  //     var x = noise(i, y) * width;
-  //     while (x_arr.includes(x)){
-  //       x = noise(i, y) * width;
-  //     }
-
-  //     if (noise(y, i) > 0.5){ // 50% chance of a new platform
-  //       platforms.push(new Platform(x, y));
-  //     }
-  //       x_arr <<  x ;
-
-  //   }
-  // }
-
-	//return platforms;
 }
+
 /**
  * moves player based upon user input
  */
 function handleKeys() {
 
   if (keyIsDown(LEFT_ARROW)) {
-
+    player.lookRight = false;
+    player.updateImg();
     player.applyForce(-1, 0);
   } else if (keyIsDown(RIGHT_ARROW)) {
-
+    player.lookRight = true;
+    player.updateImg();
     player.applyForce(1, 0);
   }
 }
@@ -269,9 +204,21 @@ function endGame() {
   }
   // clearing data
   localStorage.clear();
-
-  // console.log(score);
-  // console.log(highScore);
-
-  // song.play();
+  
+  if(gameOver){
+    // image(img,50,100,300,100);
+    textAlign(CENTER);
+    textSize(50);
+    noStroke();
+    fill("rgb(104,153,34)");
+    text("Game Over!", width / 2, height / 2);
+    textAlign(CENTER);
+    textSize(30);
+    noStroke();
+    fill("rgb(169,40,34)");
+    text(`Score : ${score}`,width / 2 , height / 2 +35)
+    button = createButton("Play");
+    button.mousePressed(play);
+    button.addClass("button");
+  }
 }

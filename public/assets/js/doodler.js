@@ -1,17 +1,28 @@
 function Doodler(x,a,enemy){
   this.loc = createVector(x,a);
   this.vel = createVector(0,0);
-  this.img = loadImage("public/assets/images/doodle.png");
+  this.img = loadImage("public/assets/images/doodler-right.png");
   this.enemy = enemy;
-  this.maxA = a;//max altitude
+  this.maxA = a; //max altitude
   this.premaxAltitude = a;
   this.eImage = loadImage("public/assets/images/doodleenemy.png");
   this.force = 12;
   this.drone = 0;
   this.s = 50;
   this.onScreen = true;
+  this.lookRight = true;
 }
+//updates the player to face left vs right
+Doodler.prototype.updateImg = function() {
+  if(this.lookRight){
+    this.img = loadImage("public/assets/images/doodler-right.png");
+  }
+  else{
+    this.img = loadImage("public/assets/images/doodler-left.png");
+  }
+};
 
+//updates doodler - enemy vs regular
 Doodler.prototype.update = function(){
   if(this.enemy){
     this.drone += map(this.maxA, 0, 15000, 0.0001, 0.1);
@@ -25,7 +36,7 @@ Doodler.prototype.update = function(){
 };
 
 Doodler.prototype.applyForce = function(force){
- this.vel.add(force);
+  this.vel.add(force);
 };
 
 Doodler.prototype.draw = function(altitude){
@@ -45,7 +56,6 @@ Doodler.prototype.draw = function(altitude){
 
 Doodler.prototype.jump = function(force){
   this.vel.y *= 0;
-  //this.newSong.play();
   if (this.premaxAltitude === this.maxA) {
 		// stronger hop as the altitude remains constant
     this.force = constrain(this.force + 1, 12, 8);
@@ -65,7 +75,6 @@ Doodler.prototype.collidesWith = function(doodler) {
 
     if (doodler.loc.y < this.loc.y) {
 			// underneath doodler
-
       endGame();
       return false;
     } else {
