@@ -24,14 +24,14 @@ Doodler.prototype.updateImg = function() {
 
 //updates doodler - enemy vs regular
 Doodler.prototype.update = function(){
-  if(this.enemy){
+  if(this.enemy){ // enemy doodler can move
     this.drone += map(this.maxA, 0, 15000, 0.0001, 0.1);
     this.loc.x = (Math.sin(this.drone) * (width / 2)) + width / 2;
   }else{
     this.loc.add(this.vel);
     this.vel.x *= 0.8;
     player.applyForce(createVector(0,GRAVITY));
-    this.maxA = (this.loc.y > this.maxA ) ? this.loc.y :this.maxA;
+    this.maxA = (this.loc.y > this.maxA) ? this.loc.y :this.maxA;
   }
 };
 

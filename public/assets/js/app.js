@@ -20,7 +20,7 @@ getRandomValue = function(max,min){
   return Math.round(val);
 }
 
-//
+//canvas set up + definitions
 function setup(){
   createCanvas(400,600);
   img = loadImage("public/assets/images/doodleenemy.png");
@@ -31,6 +31,7 @@ function setup(){
   highScore = localStorage.getItem('doodleHigh') || 0;
 }
 
+//canvas creation + player defined
 function play(){
   createCanvas(400,600);
   bg = loadImage("public/assets/images/background.png");
@@ -41,7 +42,7 @@ function play(){
   buttonPressed=true;
 }
 
-
+//main / game flow
 function draw(){
   if (buttonPressed){
     background(bg);
@@ -65,9 +66,6 @@ function draw(){
 function handlePlayer() {
 	player.update();
   player.draw();
-  // if (player.maxA + player.loc.y < -height / 2) {
-  //   endGame();
-  // }
   if(player.loc.y < 0){
     endGame();
   }
@@ -76,39 +74,34 @@ function handlePlayer() {
 /**
  * checks collision, draws, and manages all platforms
  */
-var random_boolean = false; 
-
 function handlePlatforms() {
-
-  //starter platform
   for (var i = platforms.length - 1; i >= 0; i--) {
 		// loop through platforms backward
     if (platforms[i].onScreen) {
-      //if platform moves call correct update func
+      //if platform moves
       if(platforms[i].moving && !platforms[i].hasSpring && platforms[i] instanceof Platform){
         platforms[i].update(true);
         platforms[i].drawMoving(platforms[i].altitude);
       }
+      //if platform has spring
       if(platforms[i].hasSpring){
-        //platforms[i].img = gPlatform;
         platforms[i].draw(player.loc.y);
+        //handles special boost
         if(platforms[i].collidesWith(player)){
           player.jump(25);
         }
       }
       //draws regular platform
-      // console.log('does not');
       platforms[i].draw(player.loc.y);
       
-      
+      //handles doodler on platform
 			if (platforms[i] instanceof Doodler)
-				platforms[i].update(); // update Doodlers
+				platforms[i].update();
       if (platforms[i].collidesWith(player)) {
-        /* if player collides with a power booster attached to platform
-        */
+        //regular jump
         player.jump(15);
         if (platforms[i] instanceof Doodler) {
-					// it's not a platform, but a doodler!
+					// it's not a platform, but an enemy
           points += 100;
           platforms.splice(i, 1); // remove from array
         }
@@ -124,7 +117,7 @@ function handlePlatforms() {
         platforms.push(new Platform(x, y, Math.random() > difficulty , Math.random() > difficulty));
         difficulty -= 0.0001;
       } else {
-        if (random() < (difficulty - 0.4)) {
+        if (random() < (difficulty - 0.3)) {
 					// 5% chance of being a doodler
 					platforms.push(new Doodler(x, y, true));
           difficulty -= 0.0001;
@@ -200,7 +193,7 @@ function endGame() {
     localStorage.setItem('doodleHigh', highScore);
   }
   // clearing data
-  localStorage.clear();
+  // localStorage.clear();
 
   if(gameOver){
     textAlign(CENTER);

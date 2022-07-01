@@ -1,7 +1,6 @@
 body {
     align-items: center;
     overflow: hidden;
-    /* background-image:url("../images/body_background.jpg"); */
     background-repeat: no-repeat;
     background-size: cover;
     position: relative;

@@ -24,14 +24,15 @@ Platform.prototype.update = function(random_boolean){
   }
 }
 
+//draws platform - platform type varies
 Platform.prototype.draw = function(altitude){
   if(altitude - this.altitude < height/2){
     if(this.moving && !this.hasSpring){
       image(this.img2, this.x, (altitude - this.altitude + height/2), this.s, 15);
     }
     else if(this.hasSpring && !this.moving){
-      image(this.spring, this.x, (altitude - this.altitude + height/2) - 8, this.s, 15);
       image(this.img,this.x,(altitude-this.altitude + height/2),this.s,15);
+      image(this.spring, this.x, (altitude - this.altitude + height/2) - 8, this.s, 15);
     }
     else{
       image(this.img,this.x,(altitude-this.altitude + height/2),this.s,15);
@@ -67,20 +68,3 @@ Platform.prototype.collidesWith = function(doodler){
     }
   return false;
 };
-
-// //updates the platform by moving it horizontally
-// Platform.prototype.updateMoveH = function(){
-//   if(this.x + this.radius > canvas.width || this.x < 0){
-//       this.dx = -this.dx;
-//   }
-//   this.x += this.dx;
-//   this.draw();
-// }
-
-Platform.prototype.updateMoveV = function(){
-  if(this.altitude + this.radius > canvas.height || this.altitude < 0){
-      this.dy = -this.dy;
-  }
-  this.altitude += this.dy;
-  this.draw();
-}
